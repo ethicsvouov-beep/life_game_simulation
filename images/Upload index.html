@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>나의 삶, 나의 선택 | Life Simulation</title>
+    <style>
+        :root {
+            --bg-color: #f0f2f5;
+            --card-bg: #ffffff;
+            --primary: #4a90e2;
+            --text-color: #333;
+            --rel-color: #ff6b6b;
+            --gro-color: #51cf66;
+            --hap-color: #fcc419;
+            --mea-color: #845ef7;
+        }
+
+        body {
+            font-family: 'Pretendard', -apple-system, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        #game-container {
+            width: 100%;
+            max-width: 600px;
+            background: var(--card-bg);
+            padding: 2.5rem;
+            border-radius: 24px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+            text-align: center;
+        }
+
+        .hidden { display: none; }
+        .main-title { font-size: 2.2rem; font-weight: 800; margin-bottom: 5px; color: #111; }
+        .sub-title { font-size: 1.2rem; color: #666; margin-bottom: 30px; }
+        .fixed-title { font-size: 1.5rem; font-weight: 800; margin-bottom: 20px; color: #111; border-bottom: 2px solid #eee; padding-bottom: 10px; }
+        
+        button { display: block; width: 100%; padding: 16px; margin: 10px 0; border: 1px solid #ddd; border-radius: 12px; background: white; cursor: pointer; font-size: 1rem; font-weight: 600; transition: all 0.2s; }
+        button:hover { border-color: var(--primary); background-color: #f0f7ff; }
+        .start-btn, .next-btn { background: var(--primary); color: white; border: none; margin-top: 10px; }
+        input { padding: 14px; width: calc(100% - 32px); border-radius: 12px; border: 2px solid #eee; margin-bottom: 10px; font-size: 1rem; text-align: center; }
+
+        .stats-container { display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-bottom: 25px; }
+        .stat-item { padding: 10px; border-radius: 10px; color: white; font-weight: bold; font-size: 0.85rem; }
+        .rel { background: var(--rel-color); } .gro { background: var(--gro-color); }
+        .hap { background: var(--hap-color); } .mea { background: var(--mea-color); }
+
+        .gray-box { background: #f8f9fa; border: 1px solid #e9ecef; padding: 20px; border-radius: 15px; margin: 20px 0; }
+        .white-box { background: #fff; border: 1px solid #eee; padding: 20px; border-radius: 15px; margin-bottom: 25px; text-align: left; }
+        .stage-image { width: 100%; border-radius: 15px; margin-bottom: 20px; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        
+        .event-tag { display: inline-block; color: #ff922b; font-size: 1.8rem; font-weight: 800; margin-bottom: 15px; }
+    </style>
+</head>
+<body>
+
+<div id="game-container">
+    <div id="start-screen">
+        <h1 class="main-title">나의 삶, 나의 선택</h1>
+        <div class="sub-title">Life Simulation Game</div>
+        <div style="text-align: center; line-height: 1.8; margin-bottom: 20px;">
+            이 게임은 한 번뿐인 삶을 살아가는 우리 모두의 이야기를 담은 인생 체험 게임입니다.<br>
+            여러분은 어린 시절부터 노년기까지 생애 단계별로 선택의 순간을 마주하게 됩니다.
+        </div>
+        <div style="text-align: center; margin: 30px 0 15px 0;">여러분의 모든 선택은 다음 네 가지 점수에 영향을 줍니다.</div>
+        <div class="white-box">
+            <ul style="list-style:none; padding:0; margin:0;">
+                <li style="margin-bottom:10px;">❤️<b>관계</b> : 가족, 친구 등 주변 사람과의 관계</li>
+                <li style="margin-bottom:10px;">🌱<b>성장</b> : 배움과 노력을 통한 성장</li>
+                <li style="margin-bottom:10px;">😊<b>행복</b> : 삶의 즐거움과 만족도</li>
+                <li>🌍<b>의미</b> : 다른 사람에게 준 긍정적 영향</li>
+            </ul>
+        </div>
+        <div style="text-align: center; line-height: 1.8; margin-bottom: 25px;">
+            이 게임에는 정답이 없습니다.<br>
+            다만 여러분의 선택이 여러분의 삶을 만들어 갑니다.<br>
+            또한 게임 도중 예상하지 못한 사건이 일어날 수도 있습니다.
+        </div>
+<input type="text" id="player-name" placeholder="이름을 입력하세요" maxlength="10">
+        <button class="start-btn" onclick="startGame()">인생 시작하기</button>
+    </div>
+
+    <div id="play-screen" class="hidden">
+        <div class="fixed-title">나의 삶, 나의 선택</div>
+        <div class="stats-container">
+            <div class="stat-item rel">❤️ 관계: <span id="s-rel">0</span></div>
+            <div class="stat-item gro">🌱 성장: <span id="s-gro">0</span></div>
+            <div class="stat-item hap">😊 행복: <span id="s-hap">0</span></div>
+            <div class="stat-item mea">🌍 의미: <span id="s-mea">0</span></div>
+        </div>
+        <div id="content-area"></div>
+    </div>
+
+    <div id="ending-screen" class="hidden">
+        <h1 style="font-weight: 800; text-align: center; font-size: 2rem;">인생의 여정을 마치며...</h1>
+        <div class="gray-box">
+            <div class="stats-container" style="margin-bottom: 10px;">
+                <div class="stat-item rel">❤️ 관계: <span id="f-rel">0</span></div>
+                <div class="stat-item gro">🌱 성장: <span id="f-gro">0</span></div>
+                <div class="stat-item hap">😊 행복: <span id="f-hap">0</span></div>
+                <div class="stat-item mea">🌍 의미: <span id="f-mea">0</span></div>
+            </div>
+            <p style="margin: 0; font-weight: bold; font-size: 1.1rem;">가장 크게 나타난 가치: <span id="max-value-name" style="color:var(--primary);"></span></p>
+        </div>
+        <div id="ending-description" style="line-height: 1.8; margin: 25px 0; font-size: 1.1rem; word-break: keep-all;"></div>
+        <div style="line-height: 1.8; margin: 30px 0; color: #555;">
+            <span id="final-msg-name"></span>님의 삶은 여기서 끝났지만, 여러분의 삶은 지금도 계속되고 있습니다.<br>
+            여러분은 어떤 삶을 살고, 또 어떤 사람으로 기억되고 싶은가요?<br><br>
+            <strong style="font-size: 1.3rem; color: #000; display: block; text-align: center;">이제, 여러분의 삶을 선택할 차례입니다.</strong>
+        </div>
+        <button class="next-btn" onclick="showFinalPage()">인생 시뮬레이션 종료</button>
+    </div>
+
+    <div id="final-page" class="hidden">
+        <h1 style="font-weight: 800; text-align: center; line-height: 1.4; font-size: 2rem;">게임 종료<br>나의 삶, 나의 선택</h1>
+        <div class="gray-box" style="text-align: left; line-height: 2.2; font-size: 1.1rem;">
+            ☝🏻 게임 속 여러분의 삶은 만족스러운가요?<br>
+            ✌🏻 게임 속 여러분의 삶에서 가장 낮은 점수를 받은 영역은 무엇인가요?<br>
+            👌🏻 다시 시작할 수 있다면, 여러분은 어떤 삶을 살고 싶나요?
+        </div>
+        <button onclick="location.reload()" style="background: #333; color: white; margin-top: 30px;">처음으로 돌아가기</button>
+    </div>
+</div>
+
+<script>
+    let playerName = "";
+    let currentStage = 0;
+    let stats = { rel: 0, gro: 0, hap: 0, mea: 0 };
+
+    const stages = [
+        { title: "1️⃣ 초등학교 시기", img: "01 초등학교 시기.png", q: "친한 친구가 숙제를 안 했다며 \"네 숙제 좀 보여줘\"라고 부탁한다. <br>이때 나는...", opts: [{ t: "A. 숙제를 보여준다", s: {rel:1, hap:1, gro:-1, mea:-1} }, { t: "B. 안 된다고 말하고 스스로 하라고 한다", s: {gro:1, mea:1, rel:-1} }, { t: "C. 같이 남아서 숙제를 하자고 한다", s: {rel:1, gro:1, mea:1} }] },
+        { title: "2️⃣ 중학생 시기", img: "02 중학교 시기.png", q: "시험 전날, 친구들이 같이 PC방에 가자고 한다.<br>아직 공부할 게 많이 남았지만, 친구들과 놀고 싶기도 하다.<br>이때 나는...", opts: [{ t: "A. 친구들과 PC방에 가서 게임을 한다", s: {rel:2, hap:2, gro:-1} }, { t: "B. 거절하고 집에서 공부한다", s: {gro:2, rel:-1, hap:-1} }, { t: "C. PC방에 가서 조금 놀다 다시 집에 와서 공부한다", s: {rel:1, hap:1, gro:1} }] },
+        { title: "3️⃣ 고등학생 시기", img: "03 고등학교 시기.png", q: "선생님과 진로에 관한 상담을 앞두고 있다.<br>내가 선택할 진로는...", opts: [{ t: "A. 안정적인 진로를 선택한다", s: {gro:1, hap:1} }, { t: "B. 내가 정말 좋아하는 길을 선택한다", s: {hap:2, gro:1} }, { t: "C. 다른 사람에게 도움이 되는 일을 선택한다", s: {mea:2, hap:1} }] },
+        { title: "4️⃣ 대학교 입학", img: "04 대학교 입학.png", q: "대학생이 되고, 이전에는 경험하지 못한 자유로운 시간이 생겼다.<br>나의 대학 생활은...", opts: [{ t: "A. 여행과 동아리, 대외 활동 등 다양한 경험을 한다", s: {hap:2, gro:1} }, { t: "B. 미래를 위해 열심히 전공 공부에 매진한다", s: {gro:2} }, { t: "C. 다양한 사람을 만나며 인간관계를 넓힌다", s: {rel:2, hap:1} }] },
+        { title: "5️⃣ 대학 졸업 후", img: "05 대학교 졸업.png", q: "대학교를 졸업했다. 주변에는 취업을 준비하는 친구도,<br>다른 경험을 좀 더 하는 친구도, 대학원에 진학하는 친구도 있다.<br>사회인으로서 나의 선택은...", opts: [{ t: "A. 안정적인 직장을 찾는다", s: {hap:1, gro:1} }, { t: "B. 하고 싶은 분야에 도전한다", s: {gro:2, hap:1} }, { t: "C. 사회에 도움이 되는 일을 찾는다", s: {mea:2} }] },
+        { title: "6️⃣ 취업 준비 시기", img: "06 취업준비.png", q: "취업 준비가 길어지며 고민이 생긴다.<br>취준생으로서 나의 선택은...", opts: [{ t: "A. 아쉽지만 안정적인 회사에 지원한다", s: {hap:1, gro:1} }, { t: "B. 힘들어도 내가 정말 하고 싶은 일을 준비한다", s: {gro:2, hap:-1} }, { t: "C. 사회적으로 의미 있는 일을 하는 회사에 지원한다", s: {mea:2, gro:1} }] },
+        { title: "7️⃣ 결혼 준비 시기", img: "07 결혼 준비.png", q: "슬슬 주변 친구들도 결혼하고, 나도 평생을 함께할 배우자를 찾아야 한다.<br>내가 함께 가정을 꾸리고 싶은 사람은...", opts: [{ t: "A. 함께 시간을 많이 나눌 수 있는 사람", s: {rel:2, hap:1} }, { t: "B. 각자의 꿈을 응원하며 살아갈 수 있는 사람", s: {gro:2, rel:1} }, { t: "C. 함께 사회에 기여할 수 있는 사람", s: {mea:2, rel:1} }] },
+        { title: "8️⃣ 직장 생활", img: "08 직장생활.png", q: "승진 기회를 앞둔 상황, 중요한 회의와 가족의 생일이 겹쳤다.<br>이때 나는...", opts: [{ t: "A. 일이 중요하니 회의에 참석한다", s: {gro:2, rel:-1} }, { t: "B. 회의를 빠지고 가족과 시간을 보낸다", s: {rel:2, hap:1, gro:-2} }, { t: "C. 회의에 참석했다가 일찍 나와 집으로 간다", s: {rel:1, hap:1} }] },
+        { title: "9️⃣ 출산 이후", img: "09 출산 이후.png", q: "나와 배우자를 닮은 아이가 생겼다.<br>이 아이가 멋진 어른으로 성장할 수 있도록, 나와 배우자는...", opts: [{ t: "A. 일보다 아이와 보내는 시간을 늘린다", s: {rel:2, hap:1} }, { t: "B. 일을 계속하며 경제적 지원을 늘린다", s: {gro:2, rel:-1} }, { t: "C. 공부보다 의미 있는 봉사활동을 함께 한다", s: {mea:2} }] },
+        { title: "🔟 퇴직 이후", img: "10 퇴직 이후.png", q: "직장에서의 마지막 해를 보내고, 은퇴 시기가 찾아왔다.<br>퇴직 이후 나의 삶은...", opts: [{ t: "A. 가족과 시간을 보낸다", s: {rel:2, hap:1} }, { t: "B. 새로운 배움이나 취미를 시작한다", s: {gro:2, hap:1} }, { t: "C. 봉사나 기부 등 나눔을 실천한다", s: {mea:2, hap:1} }] }
+    ];
+
+const eventPool = [
+        // 1) 초등학교 시기 (1번 질문 전후)
+        { text: "나에게 큰 영향을 주는 좋은 선생님을 만났습니다.\n선생님을 통해 많은 배움을 얻고, 나도 다른 사람에게 도움을 주었습니다.<br>→ 🌱 +2 / 🌍 +1", s: {gro:2, mea:1}, cond: (idx) => idx === 0 || idx === 1 },
+        { text: "평생을 함께할 수 있는 마음 맞는 친구를 만났습니다.\n친구와 즐거운 추억을 쌓으며 학창 시절을 보내게 되었습니다.<br>→ ❤️ +2 / 😊 +1", s: {rel:2, hap:1}, cond: (idx) => idx === 0 || idx === 1 },
+        { text: "정든 동네를 두고 다른 학교로 전학을 가게 되었습니다.\n친구들과의 관계는 끊어졌지만, 새로운 배움이 당신을 기다리고 있습니다.<br>→ ❤️ -1 / 🌱 +1", s: {rel:-1, gro:1}, cond: (idx) => idx === 0 || idx === 1 },
+        
+        // 2) 중학교, 고등학교 시기 (2, 3번 질문 전후)
+        { text: "학교 대표로 참가한 중요한 대회에서 입상에 실패했습니다.\n기분은 우울했지만, 많은 배움을 얻었습니다.<br>→ 🌱 +2 / 😊 -2", s: {gro:2, hap:-2}, cond: (idx) => idx === 1 || idx === 2 || idx === 3 },
+        { text: "친한 친구와 크게 다투어 관계가 깨졌습니다.\n친구와의 관계도, 기분도 우울하기만 합니다.<br>→ ❤️ -2 / 😊 -1", s: {rel:-2, hap:-1}, cond: (idx) => idx === 1 || idx === 2 || idx === 3 },
+        { text: "우연히 좋아하는 취미를 발견했습니다.\n이 취미는 당신의 삶을 더 풍성하고 즐겁게 만들어줄 것입니다.<br>→ 😊 +2 / 🌱 +1", s: {hap:2, gro:1}, cond: (idx) => idx === 1 || idx === 2 || idx === 3 },
+
+        // 3) 대학생, 취준생 시기
+        // 4번 입학 이후 ~ 6번 취업 준비 이전
+        { text: "잊지 못할 여행 경험을 했습니다.\n이 여행의 기억이 힘들고 지칠 때마다 나를 붙들어줄 것입니다.<br>→ 😊 +2 / 🌱 +1", s: {hap:2, gro:1}, cond: (idx) => idx >= 4 && idx < 5 },
+        // 5번 졸업 직후에만
+        { text: "대학교 졸업 직후 생각지 못한 좋은 기회가 찾아왔습니다.\n이 기회를 잡아 큰 배움을 얻고, 사회에도 도움이 되는 일을 해냈습니다.<br>→ 🌱 +2 / 🌍 +1", s: {gro:2, mea:1}, cond: (idx) => idx === 5 },
+        // 5번 졸업 이후 ~ 6번 취업 준비 이전
+        { text: "첫 도전에서 취업에 실패했습니다.\n우울하고 불안하지만, 도전만으로 큰 배움을 얻었습니다.<br>→ 😊 -2 / 🌱 +1", s: {hap:-2, gro:1}, cond: (idx) => idx >= 5 && idx < 6 },
+
+        // 4) 직장인 시기 (8번 질문 전후)
+        { text: "직장에서 맡은 중요한 프로젝트를 성공했습니다.\n한층 성장했다는 기분이 나를 행복하게 합니다.<br>→ 🌱 +2 / 😊 +1", s: {gro:2, hap:1}, cond: (idx) => idx === 7 || idx === 8 },
+        { text: "직장에서 억울하게 누명을 쓰게 되었습니다.\n직장 동료들과의 관계도, 삶의 즐거움도 잃어버렸습니다.<br>→ 😊 -2 / ❤️ -1", s: {hap:-2, rel:-1}, cond: (idx) => idx === 7 || idx === 8 },
+        { text: "후배 직원에게 큰 도움을 주었습니다.\n직장에서 의미 있는 일을 했다는 기쁨으로 충만합니다.<br>→ 🌍 +2 / ❤️ +1", s: {mea:2, rel:1}, cond: (idx) => idx === 7 || idx === 8 },
+
+        // 5) 가정을 꾸린 이후
+        // 7번 결혼 이후 ~ 9번 출산 이전
+        { text: "자녀 계획으로 배우자와 크게 다투었습니다.\n직장도, 가정도 무거운 짐처럼 느껴집니다.<br>→ 😊 -1 / ❤️ -2", s: {hap:-1, rel:-2}, cond: (idx) => idx >= 7 && idx < 8 },
+        // 9번 출산 이후에만
+        { text: "아이가 학교에서 큰 상을 받았습니다.\n아이의 성장을 보며 큰 기쁨을 느낍니다.<br>→ ❤️ +2 / 😊 +2", s: {rel:2, hap:2}, cond: (idx) => idx >= 9 },
+        // 8번 직장 생활 이후 ~ 10번 퇴직 이전
+     { text: "건강이 나빠져 잠시 일을 쉬게 되었습니다.\n직장에서의 관계도, 나의 커리어도 멈춘 것만 같습니다.\n→ 😊 -1 / 🌱 -1", s: {hap:-1, gro:-1}, cond: (idx) => idx >= 8 && idx < 10 }
+    ];
+
+    function startGame() {
+        const nameVal = document.getElementById('player-name').value;
+        if(!nameVal) return alert("이름을 입력해 주세요!");
+        playerName = nameVal;
+        document.getElementById('start-screen').classList.add('hidden');
+        document.getElementById('play-screen').classList.remove('hidden');
+        renderStage();
+    }
+
+    function renderStage() {
+        if (currentStage >= stages.length) { showEnding(); return; }
+        showQuestion();
+    }
+
+    function showQuestion() {
+        updateUI();
+        const data = stages[currentStage];
+        const content = document.getElementById('content-area');
+        content.innerHTML = `
+            <h2 style="margin-bottom: 20px;">${data.title}</h2>
+            <img src="${data.img}" class="stage-image">
+            <p style="font-size: 1.1rem; margin: 20px 0; white-space: pre-wrap; line-height: 1.6; word-break: keep-all;">${data.q}</p>
+            <div id="options-area"></div>
+        `;
+        const area = document.getElementById('options-area');
+        data.opts.forEach(opt => {
+            const btn = document.createElement('button');
+            btn.innerText = opt.t;
+            btn.onclick = () => {
+                for(let key in opt.s) stats[key] += opt.s[key];
+                currentStage++;
+                
+                // 30% 확률로 다음 질문 전 돌발 사건 등장
+                if (currentStage < stages.length && Math.random() < 0.3) {
+                    const available = eventPool.filter(e => e.cond(currentStage));
+                    if(available.length > 0) {
+                        showEvent(available[Math.floor(Math.random() * available.length)]);
+                    } else {
+                        renderStage();
+                    }
+                } else {
+                    renderStage();
+                }
+            };
+            area.appendChild(btn);
+        });
+    }
+
+    function showEvent(ev) {
+        updateUI();
+        for(let key in ev.s) stats[key] += ev.s[key];
+        const content = document.getElementById('content-area');
+        content.innerHTML = `
+            <div class="event-tag">⚠️ 예상치 못한 사건 발생</div>
+            <div class="gray-box" style="font-size: 1.2rem; line-height: 1.8; white-space: pre-wrap; word-break: keep-all;">${ev.text}</div>
+            <button class="next-btn" onclick="renderStage()">계속하기</button>
+        `;
+    }
+
+    function updateUI() {
+        document.getElementById('s-rel').innerText = stats.rel;
+        document.getElementById('s-gro').innerText = stats.gro;
+        document.getElementById('s-hap').innerText = stats.hap;
+        document.getElementById('s-mea').innerText = stats.mea;
+    }
+
+    function showEnding() {
+        document.getElementById('play-screen').classList.add('hidden');
+        document.getElementById('ending-screen').classList.remove('hidden');
+        document.getElementById('f-rel').innerText = stats.rel;
+        document.getElementById('f-gro').innerText = stats.gro;
+        document.getElementById('f-hap').innerText = stats.hap;
+        document.getElementById('f-mea').innerText = stats.mea;
+        document.getElementById('final-msg-name').innerText = playerName;
+
+        const maxKey = Object.keys(stats).reduce((a, b) => stats[a] >= stats[b] ? a : b);
+        const labels = { rel: "관계", gro: "성장", hap: "행복", mea: "의미" };
+        document.getElementById('max-value-name').innerText = labels[maxKey];
+
+        let desc = "";
+        if(maxKey === 'rel') desc = `${playerName}은(는) 사람들과 함께 시간을 나누며 살았습니다.<br>${playerName}의 행동은 많은 사람들에게 따뜻하고 고마운 기억으로 남았습니다.`;
+        else if(maxKey === 'gro') desc = `${playerName}은(는) 계속 배우고 도전하며 성장했습니다.<br>사람들은 ${playerName}을(를) 늘 노력하고 도전하는 사람으로 기억할 것입니다.`;
+        else if(maxKey === 'hap') desc = `${playerName}은(는) 순간 순간의 즐거움을 추구하며 살았습니다.<br>${playerName}의 삶은 많은 사람들에게 행복의 의미를 일깨워줍니다.`;
+        else desc = `${playerName}은(는) 다른 사람과 사회에 도움이 되는 삶을 살았습니다.<br>${playerName}의 뜻을 이어받아 많은 사람들이 봉사와 나눔을 실천할 것입니다.`;
+        document.getElementById('ending-description').innerHTML = desc;
+    }
+
+    function showFinalPage() {
+        document.getElementById('ending-screen').classList.add('hidden');
+        document.getElementById('final-page').classList.remove('hidden');
+    }
+</script>
+</body>
+</html>
